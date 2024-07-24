@@ -120,7 +120,14 @@ public class XmlParserHelper {
 		ContextProvidingValidationEventHandler handler = new ContextProvidingValidationEventHandler();
 		try {
 			staxEventReader = new JpaNamespaceTransformingEventReader( staxEventReader );
-			JAXBContext jaxbContext = JAXBContext.newInstance( ObjectFactory.class );
+
+			// Class.getClassLoader() may return null if the class was loaded by the bootstrap class loader,
+			// but since we don't expect the annotation processor to be loaded by that class loader,
+			// we expect the return to be non-null and hence cast
+			ClassLoader cl = NullnessUtil.castNonNull( ObjectFactory.class.getClassLoader() );
+			String packageName = NullnessUtil.castNonNull( ObjectFactory.class.getPackage() ).getName();
+			JAXBContext jaxbContext = JAXBContext.newInstance( packageName, cl );
+
 			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 			unmarshaller.setSchema( schema );
 			unmarshaller.setEventHandler( handler );
