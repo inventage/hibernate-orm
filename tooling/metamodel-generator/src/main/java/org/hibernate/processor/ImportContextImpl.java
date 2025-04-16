@@ -68,7 +68,13 @@ public class ImportContextImpl implements ImportContext {
 	public String importType(String typeExpression) {
 		String result = typeExpression;
 
-		// strip off type annotations and '? super' or '? extends'
+        // This is a custom adaptation to our project where `T` would lead to compile errors.
+        if (result.equals("T")) {
+            System.out.println("Inventage Override: Changing 'T' typeExpression to '?'.");
+            return "?";
+        }
+
+        // strip off type annotations and '? super' or '? extends'
 		String preamble = "";
 		if ( result.startsWith( "@" ) ) {
 			int index = result.lastIndexOf(' ');
